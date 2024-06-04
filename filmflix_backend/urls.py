@@ -19,10 +19,12 @@ from django.urls import path
 
 from filmflix.views import LoginView, RegisterView
 
+from django.conf import settings
+from django.conf.urls.static import static
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', LoginView.as_view()),
-    path('register/', RegisterView.as_view()),
-    
-    
-]
+    path('register/', RegisterView.as_view()), 
+] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
