@@ -1,7 +1,10 @@
 from django.dispatch import receiver
 from filmflix.tasks import convert_480p, convert_720p, delete_480p, delete_720p
+from filmflix_backend.settings import CACHETTL
 from .models import Video
 from django.db.models.signals import post_save, post_delete
+from django.views.decorators.cache import cache_page 
+
 import os
 
 # receiver ist die funktion --> wird ausgeführt, wenn signal geschickt wird
@@ -9,6 +12,7 @@ import os
 # sender ist das model, dass das Signal schickt
 # insatnce ist entweder schon vorhanden oder wird neu erstellt
 @receiver(post_save, sender=Video)
+@cache_page(CACHETTL)
 def video_post_save(sender, instance, created, **kwargs):
     print("Video wurde gespeichert")
     print(instance.videos_file.path)
@@ -21,6 +25,7 @@ def video_post_save(sender, instance, created, **kwargs):
 
 
 @receiver(post_delete, sender=Video)
+@cache_page(CACHETTL)
 def video_post_delete(sender, instance, **kwargs):    
     
     if instance.videos_file:

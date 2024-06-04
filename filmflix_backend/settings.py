@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from django.conf import settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,10 +33,15 @@ ALLOWED_HOSTS = [
     '127.0.0.1'
 ]
 
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",
 ]
 
+CACHETTL = getattr(settings, 'CACHETTL', DEFAULT_TIMEOUT)
 
 # Application definition
 
@@ -45,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "debug_toolbar",
     'rest_framework',
     'rest_framework.authtoken',
     'filmflix.apps.FilmflixConfig',
@@ -52,8 +60,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    
-    "corsheaders.middleware.CorsMiddleware",
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -61,7 +69,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "django.middleware.common.CommonMiddleware",
+    'django.middleware.common.CommonMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'filmflix_backend.urls'
@@ -150,3 +159,12 @@ REST_FRAMEWORK = {
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL = 'media/'
+
+CACHES = {    
+          "default": {        
+              "BACKEND": "django_redis.cache.RedisCache",        
+              "LOCATION": "redis://127.0.0.1:6379/1",        
+              "OPTIONS": {            
+                  "CLIENT_CLASS": "django_redis.client.DefaultClient"        },        
+              "KEY_PREFIX": "videoflix"    }
+          }
