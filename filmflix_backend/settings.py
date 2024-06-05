@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'filmflix.apps.FilmflixConfig',
     "corsheaders",
+    'django_rq',
 ]
 
 MIDDLEWARE = [
@@ -164,7 +165,20 @@ CACHES = {
           "default": {        
               "BACKEND": "django_redis.cache.RedisCache",        
               "LOCATION": "redis://127.0.0.1:6379/1",        
-              "OPTIONS": {            
+              "OPTIONS": {     
+                  'PASSWORD': 'foobared',       
                   "CLIENT_CLASS": "django_redis.client.DefaultClient"        },        
               "KEY_PREFIX": "videoflix"    }
           }
+
+
+#change password in redis.config "requirepass"
+RQ_QUEUES = {
+    'default': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'PASSWORD': 'foobared',
+        'DEFAULT_TIMEOUT': 360,
+    }
+}
