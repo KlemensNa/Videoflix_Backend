@@ -13,7 +13,8 @@ import os
 # sender ist das model, dass das Signal schickt
 # insatnce ist entweder schon vorhanden oder wird neu erstellt
 @receiver(post_save, sender=Video)
-@cache_page(CACHETTL)
+# @cache_page(CACHETTL)n
+
 def video_post_save(sender, instance, created, **kwargs):
     print("Video wurde gespeichert")
     
@@ -23,7 +24,7 @@ def video_post_save(sender, instance, created, **kwargs):
         if os.path.isfile(instance.videos_file.path):
             
             # load new queue --> can also load high, low if defined
-            queue = django_rq.get_queue('default', autocommit=True)
+            queue = django_rq.get_queue('default', autocommit=True, is_async=True)
             
             # call function convert_xxx with in queue --> functions runs in background
             queue.enqueue(convert_480p, instance.videos_file.path)
@@ -31,15 +32,16 @@ def video_post_save(sender, instance, created, **kwargs):
 
 
 @receiver(post_delete, sender=Video)
-@cache_page(CACHETTL)
+# @cache_page(CACHETTL)
 def video_post_delete(sender, instance, **kwargs):    
     
     if instance.videos_file:
         
         if os.path.isfile(instance.videos_file.path):
+            
+            # delete_480p(instance.videos_file.path)
+            # delete_720p(instance.videos_file.path)
             os.remove(instance.videos_file.path)
-            delete_480p(instance.videos_file.path)
-            delete_720p(instance.videos_file.path)
             print('video gelöscht')
 
         
