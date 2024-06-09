@@ -8,6 +8,7 @@ import django_rq
 from django_rq import enqueue
 import os
 
+
 # receiver ist die funktion --> wird ausgeführt, wenn signal geschickt wird
 # post_save Signal das nach dem Speichern einer Instanz gesendet wird
 # sender ist das model, dass das Signal schickt
