@@ -18,9 +18,9 @@ import os
 
 def video_post_save(sender, instance, created, **kwargs):
     print("Video wurde gespeichert")
-    
     if created:
         print("New Video created")
+        
         
         if os.path.isfile(instance.videos_file.path):
             
@@ -29,7 +29,7 @@ def video_post_save(sender, instance, created, **kwargs):
             
             # call function convert_xxx with in queue --> functions runs in background
             queue.enqueue(convert_480p, instance.videos_file.path)
-            queue.enqueue(convert_720p, instance.videos_file.path) 
+            queue.enqueue(convert_720p, instance.videos_file.path)
 
 
 @receiver(post_delete, sender=Video)
@@ -40,9 +40,10 @@ def video_post_delete(sender, instance, **kwargs):
         
         if os.path.isfile(instance.videos_file.path):
             
-            # delete_480p(instance.videos_file.path)
-            # delete_720p(instance.videos_file.path)
+            delete_480p(instance.videos_file.path)
+            delete_720p(instance.videos_file.path)
             os.remove(instance.videos_file.path)
+            os.remove(instance.thumbnail.path)
             print('video gelöscht')
 
         

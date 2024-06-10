@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'filmflix.apps.FilmflixConfig',
     "corsheaders",
+    'import_export',
     'django_rq',
 ]
 
@@ -141,6 +142,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/staticfiles')
+
+IMPORT_EXPORT_USE_TRANSACTIONS = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
