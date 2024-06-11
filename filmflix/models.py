@@ -11,12 +11,28 @@ class CustomerUser(AbstractUser):
     
     
 class Video(models.Model):
+    
+    SPORT_CHOICES = [
+        ('golf', 'Golf'),
+        ('football', 'Fußball'),
+        ('handball', 'Handball'),
+        ('basketball', 'Basketball'),
+    ]
+    
+    CATEGORY_CHOICES = [
+        ("", ''),
+        ('ussport', 'US-Sport'),
+        ('ballsport', 'Ballsport'),
+    ]
+    
     title = models.TextField(max_length=80)
     description = models.TextField(max_length=300)
     created_at = models.DateField(default=date.today)
     videos_file = models.FileField(upload_to="videos", blank=False, null=False)
     thumbnail = models.ImageField(upload_to="thumbnails", blank=False, null=False)
     isplaying = models.BooleanField(default=False)
+    sport = models.CharField(max_length=20, choices=SPORT_CHOICES, default='', blank=False, null=False)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, blank=True, null=True)
     
     def __str__(self):
         return self.title

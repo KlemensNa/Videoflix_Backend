@@ -40,8 +40,8 @@ def video_post_delete(sender, instance, **kwargs):
         
         if os.path.isfile(instance.videos_file.path):
             
-            delete_480p(instance.videos_file.path)
-            delete_720p(instance.videos_file.path)
+            # delete_480p(instance.videos_file.path)
+            # delete_720p(instance.videos_file.path)
             os.remove(instance.videos_file.path)
             os.remove(instance.thumbnail.path)
             print('video gelöscht')
