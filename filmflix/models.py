@@ -17,6 +17,10 @@ class Video(models.Model):
         ('football', 'Fußball'),
         ('handball', 'Handball'),
         ('basketball', 'Basketball'),
+        ('boxing', 'Boxen'),
+        ('skate', 'Skateboard'),
+        ('baseball', 'Baseball'),
+        ('amFootball', 'American Football'),
     ]
     
     CATEGORY_CHOICES = [
