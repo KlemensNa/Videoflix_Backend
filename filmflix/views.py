@@ -5,7 +5,7 @@ from rest_framework import status
 from filmflix.models import Video
 from django.contrib.auth import get_user_model
 
-from filmflix.serializers import VideoSerializer
+from filmflix.serializers import ChangePasswordSerializer, VideoSerializer
 
 User = get_user_model()
 class LoginView(ObtainAuthToken):
@@ -20,8 +20,7 @@ class LoginView(ObtainAuthToken):
         return Response({
             'token': token.key,
             'user_id': user.pk,
-            'username': user.username
-            
+            'username': user.username            
         })       
         
 
@@ -91,3 +90,27 @@ class VideoView(APIView):
         
         video.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
+
+class ChangePassword(APIView):
+    serializer_class = ChangePasswordSerializer
+
+    def put(self, request, pk):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            password = serializer.validated_data['old_password']
+            new_password = serializer.validated_data['new_password']
+
+            try:
+                obj = get_user_model().objects.get(pk=pk)
+            except User.DoesNotExist:
+                return Response({'error': 'User not found'}, status=404)
+
+            if not obj.check_password(password):
+                return Response({'error': 'Old password does not match'}, status=400)
+
+            obj.set_password(new_password)
+            obj.save()
+            return Response({'success': 'Password changed successfully'}, status=200)
+        return Response(serializer.errors, status=400)
