@@ -28,3 +28,6 @@ class VideoSerializer(serializers.ModelSerializer):
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
+    
+class ChangeNameSerializer(serializers.Serializer):
+    new_name = serializers.CharField(required=True)

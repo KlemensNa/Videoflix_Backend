@@ -5,7 +5,7 @@ from rest_framework import status
 from filmflix.models import Video
 from django.contrib.auth import get_user_model
 
-from filmflix.serializers import ChangePasswordSerializer, VideoSerializer
+from filmflix.serializers import ChangeNameSerializer, ChangePasswordSerializer, VideoSerializer
 
 User = get_user_model()
 class LoginView(ObtainAuthToken):
@@ -113,4 +113,24 @@ class ChangePassword(APIView):
             obj.set_password(new_password)
             obj.save()
             return Response({'success': 'Password changed successfully'}, status=200)
+        return Response(serializer.errors, status=400)
+    
+    
+
+class ChangeName(APIView):
+    serializer_class = ChangeNameSerializer
+
+    def put(self, request, pk):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            new_name = serializer.validated_data['new_name']
+
+            try:
+                user = get_user_model().objects.get(pk=pk)
+            except User.DoesNotExist:
+                return Response({'error': 'User not found'}, status=404)
+
+            user.username = new_name
+            user.save()
+            return Response({'success': 'Name changed successfully'}, status=200)
         return Response(serializer.errors, status=400)

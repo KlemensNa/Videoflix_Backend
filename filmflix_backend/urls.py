@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from filmflix.views import ChangePassword, LoginView, RegisterView, VideoView
+from filmflix.views import ChangeName, ChangePassword, LoginView, RegisterView, VideoView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -28,5 +28,6 @@ urlpatterns = [
     path('video/', VideoView.as_view()),
     path("__debug__/", include("debug_toolbar.urls")),
     path('django-rq/', include('django_rq.urls')),
-    path('change_password/<int:pk>/', ChangePassword.as_view(), name='change_password'),
+    path('change_password/<int:pk>/', ChangePassword.as_view()),
+    path('change_name/<int:pk>/', ChangeName.as_view()),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
