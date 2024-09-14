@@ -1,11 +1,11 @@
 from rest_framework.authtoken.views import ObtainAuthToken, APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from rest_framework import status
-from filmflix.models import Video
+from rest_framework import status, generics
+from filmflix.models import Icon, Video
 from django.contrib.auth import get_user_model
 
-from filmflix.serializers import ChangeNameSerializer, ChangePasswordSerializer, VideoSerializer
+from filmflix.serializers import ChangeNameSerializer, ChangePasswordSerializer, IconSerializer, VideoSerializer
 
 User = get_user_model()
 class LoginView(ObtainAuthToken):
@@ -16,11 +16,15 @@ class LoginView(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
+        print(user)
+        
+        icon_serializer = IconSerializer(user.icon)
         
         return Response({
             'token': token.key,
             'user_id': user.pk,
-            'username': user.username            
+            'username': user.username,   
+            'icon': icon_serializer.data         
         })       
         
 
@@ -29,14 +33,18 @@ class RegisterView(APIView):
     def post(self, request, format=None):
         try:
             user = User.objects.create_user(username=request.data.get('username'),
-                                    email=request.data.get('email'),
-                                    password=request.data.get('password'))
-            token, created = Token.objects.get_or_create(user=user)        
+                                            email=request.data.get('email'),
+                                            password=request.data.get('password'),
+                                            icon=request.data.get("icon"))
+            token, created = Token.objects.get_or_create(user=user)
+            
+            icon_serializer = IconSerializer(user.icon)    
             
             return Response({
                 'token': token.key,
                 'username': user.username,
-                'email': user.email
+                'email': user.email,
+                'icon': icon_serializer.data
             })
             
         except:
@@ -134,3 +142,9 @@ class ChangeName(APIView):
             user.save()
             return Response({'success': 'Name changed successfully'}, status=200)
         return Response(serializer.errors, status=400)
+    
+
+
+class IconListView(generics.ListAPIView):
+    queryset = Icon.objects.all()
+    serializer_class = IconSerializer

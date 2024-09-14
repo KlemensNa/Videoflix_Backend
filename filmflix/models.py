@@ -2,9 +2,19 @@ from datetime import date
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+
+
+class Icon(models.Model):
+    name = models.CharField(max_length=255)
+    image = models.FileField(upload_to='icons/')  # Icons werden im 'icons/' Ordner gespeichert
+
+    def __str__(self):
+        return self.name
+
 # AbstractUser is default User in Django
 class CustomerUser(AbstractUser):
     email = models.EmailField(max_length=100, unique=True)
+    icon = models.OneToOneField(Icon, on_delete=models.SET_NULL, null=True, blank=True,)
     
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ['username']

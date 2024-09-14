@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Video
+from .models import Icon, Video
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -16,7 +16,8 @@ class CustomerUserSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(
             email=validated_data['email'],
             username=validated_data.get('username'),
-            password=validated_data['password']
+            password=validated_data['password'],
+            # icon = icon
         )
         return user
     
@@ -31,3 +32,9 @@ class ChangePasswordSerializer(serializers.Serializer):
     
 class ChangeNameSerializer(serializers.Serializer):
     new_name = serializers.CharField(required=True)
+    
+
+class IconSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Icon
+        fields = ['id', 'name', 'image']

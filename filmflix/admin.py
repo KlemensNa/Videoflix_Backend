@@ -1,7 +1,7 @@
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from django.contrib import admin
-from .models import Video, CustomerUser
+from .models import Video, CustomerUser, Icon
 from django.contrib.auth.admin import UserAdmin
 
 
@@ -16,10 +16,25 @@ class VideoResource(resources.ModelResource):
 
     class Meta:
         model = Video  
-        
+
+
+@admin.register(Icon)
+class IconAdmin(admin.ModelAdmin):
+    list_display = ('name', 'image') 
+    
         
 @admin.register(Video)
 class VideoAdmin(ImportExportModelAdmin):
     pass
 
-admin.site.register(CustomerUser, UserAdmin)
+@admin.register(CustomerUser)
+class CustomerUserAdmin(admin.ModelAdmin):
+    list_display = ('email', 'username', 'icon')  # Zeigt auch das Icon an
+    list_filter = ('icon',)
+    
+    fieldsets = UserAdmin.fieldsets + (
+        (None, {'fields': ('icon',)}),
+    )
+
+
+# admin.site.register(CustomerUser, UserAdmin)
