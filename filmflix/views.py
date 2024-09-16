@@ -1,13 +1,25 @@
 from rest_framework.authtoken.views import ObtainAuthToken, APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, generics
 from filmflix.models import Icon, Video
 from django.contrib.auth import get_user_model
 
-from filmflix.serializers import ChangeNameSerializer, ChangePasswordSerializer, IconSerializer, VideoSerializer
+from filmflix.serializers import ChangeNameSerializer, ChangePasswordSerializer, CustomerUserSerializer, IconSerializer, VideoSerializer
 
 User = get_user_model()
+
+
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user    
+        user_serializer = CustomerUserSerializer(user)
+        print(user_serializer.data)
+        return Response(user_serializer.data)
+
 class LoginView(ObtainAuthToken):
     
     def post(self, request, *args, **kwargs):
@@ -126,25 +138,59 @@ class ChangePassword(APIView):
     
 
 class ChangeName(APIView):
-    serializer_class = ChangeNameSerializer
 
     def put(self, request, pk):
-        serializer = self.serializer_class(data=request.data)
+        serializer = ChangeNameSerializer(data=request.data)
+        
         if serializer.is_valid():
             new_name = serializer.validated_data['new_name']
-
+            new_icon_data = serializer.validated_data['new_icon']
+            
             try:
-                user = get_user_model().objects.get(pk=pk)
+                user = User.objects.get(pk=pk)
             except User.DoesNotExist:
-                return Response({'error': 'User not found'}, status=404)
-
+                return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+            
+            # Update the user's name
             user.username = new_name
+
+            # Update the user's icon
+            try:
+                # Versuche das Icon anhand der ID zu finden und zuzuweisen
+                icon = Icon.objects.get(id=new_icon_data['id'])
+            except Icon.DoesNotExist:
+                # Falls das Icon nicht existiert, erstelle ein neues
+                icon_serializer = IconSerializer(data=new_icon_data)
+                print(icon_serializer)
+                if icon_serializer.is_valid():
+                    icon = icon_serializer.save()
+                else:
+                    return Response(icon_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            print(icon)
+            user.icon = icon
             user.save()
-            return Response({'success': 'Name changed successfully'}, status=200)
-        return Response(serializer.errors, status=400)
+
+            return Response({'success': 'Name and Icon updated successfully'}, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
 
 
 class IconListView(generics.ListAPIView):
     queryset = Icon.objects.all()
     serializer_class = IconSerializer
+    
+
+class IconView(generics.RetrieveAPIView):
+    queryset = Icon.objects.all()
+    serializer_class = IconSerializer
+
+    def get(self, request, pk=None):
+        try:
+            icon = Icon.objects.get(pk=pk)
+        except Icon.DoesNotExist:
+            return Response({'error': 'Icon not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = IconSerializer(icon, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -1,13 +1,25 @@
 from rest_framework import serializers
-from .models import Icon, Video
+from .models import CustomerUser, Icon, Video
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
+class IconSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Icon
+        fields = ['id', 'name', 'image']
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        image_url = obj.image.url
+        return request.build_absolute_uri(image_url) if request else image_url
 class CustomerUserSerializer(serializers.ModelSerializer):
+
+    icon = IconSerializer(read_only=True)
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'password')
+        fields = ('id', 'email', 'username', 'password', 'icon')
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -29,12 +41,17 @@ class VideoSerializer(serializers.ModelSerializer):
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
-    
+
 class ChangeNameSerializer(serializers.Serializer):
     new_name = serializers.CharField(required=True)
-    
+    new_icon = serializers.JSONField()  # Damit wird das neue Icon als JSON akzeptiert
 
 class IconSerializer(serializers.ModelSerializer):
     class Meta:
         model = Icon
         fields = ['id', 'name', 'image']
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        image_url = obj.image.url
+        return request.build_absolute_uri(image_url) if request else image_url

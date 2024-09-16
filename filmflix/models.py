@@ -14,7 +14,7 @@ class Icon(models.Model):
 # AbstractUser is default User in Django
 class CustomerUser(AbstractUser):
     email = models.EmailField(max_length=100, unique=True)
-    icon = models.OneToOneField(Icon, on_delete=models.SET_NULL, null=True, blank=True,)
+    icon = models.ForeignKey(Icon, on_delete=models.SET_NULL, null=True, blank=True,)
     
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ['username']
