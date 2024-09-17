@@ -17,7 +17,6 @@ class CurrentUserView(APIView):
     def get(self, request):
         user = request.user    
         user_serializer = CustomerUserSerializer(user)
-        print(user_serializer.data)
         return Response(user_serializer.data)
 
 class LoginView(ObtainAuthToken):
@@ -48,9 +47,8 @@ class RegisterView(APIView):
                                             email=request.data.get('email'),
                                             password=request.data.get('password'),
                                             icon=request.data.get("icon"))
-            token, created = Token.objects.get_or_create(user=user)
-            
-            icon_serializer = IconSerializer(user.icon)    
+            token, created = Token.objects.get_or_create(user=user)            
+            icon_serializer = IconSerializer(user.icon)  
             
             return Response({
                 'token': token.key,
@@ -62,7 +60,7 @@ class RegisterView(APIView):
         except:
             return 
         
-        
+     
 
 class VideoView(APIView):    
     #Authentication with token
@@ -145,18 +143,21 @@ class ChangeName(APIView):
         if serializer.is_valid():
             new_name = serializer.validated_data['new_name']
             new_icon_data = serializer.validated_data['new_icon']
+            new_first_name = serializer.validated_data['new_firstname']
+            new_last_name = serializer.validated_data['new_lastname']
             
             try:
                 user = User.objects.get(pk=pk)
             except User.DoesNotExist:
                 return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
             
-            # Update the user's name
             user.username = new_name
-
-            # Update the user's icon
+            user.first_name = new_first_name
+            user.last_name = new_last_name
+            
+            print(user)
+            
             try:
-                # Versuche das Icon anhand der ID zu finden und zuzuweisen
                 icon = Icon.objects.get(id=new_icon_data['id'])
             except Icon.DoesNotExist:
                 # Falls das Icon nicht existiert, erstelle ein neues

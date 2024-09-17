@@ -41,6 +41,14 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",
 ]
 
+# CSRF_TRUSTED_ORIGINS = ['http://localhost:4200', 'http://127.0.0.1'] #weg nach entwicklunsgphase
+
+# CSRF_COOKIE_SECURE = False
+
+# SESSION_COOKIE_SECURE = False
+
+DEBUG = True
+
 CACHETTL = getattr(settings, 'CACHETTL', DEFAULT_TIMEOUT)
 
 # Application definition
@@ -156,8 +164,7 @@ AUTH_USER_MODEL = "filmflix.CustomerUser"
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [       
-        'rest_framework.authentication.TokenAuthentication', 
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',        
     ]
@@ -189,5 +196,13 @@ RQ_QUEUES = {
         'DEFAULT_TIMEOUT': 360,
     }
 }
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.example.com' #change
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'your_email@example.com'      #change
+# EMAIL_HOST_PASSWORD = 'your_password'           #change
+# DEFAULT_FROM_EMAIL = 'webmaster@example.com'    #change
 
 

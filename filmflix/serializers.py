@@ -14,12 +14,14 @@ class IconSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         image_url = obj.image.url
         return request.build_absolute_uri(image_url) if request else image_url
+    
+    
 class CustomerUserSerializer(serializers.ModelSerializer):
 
     icon = IconSerializer(read_only=True)
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'password', 'icon')
+        fields = ('id', 'email', 'first_name', 'last_name', 'username', 'password', 'icon')
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -44,14 +46,8 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 class ChangeNameSerializer(serializers.Serializer):
     new_name = serializers.CharField(required=True)
+    new_firstname = serializers.CharField(required=True)
+    new_lastname = serializers.CharField(required=True)
     new_icon = serializers.JSONField()  # Damit wird das neue Icon als JSON akzeptiert
 
-class IconSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Icon
-        fields = ['id', 'name', 'image']
 
-    def get_image(self, obj):
-        request = self.context.get('request')
-        image_url = obj.image.url
-        return request.build_absolute_uri(image_url) if request else image_url
