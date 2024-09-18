@@ -88,7 +88,7 @@ ROOT_URLCONF = 'filmflix_backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -197,12 +197,12 @@ RQ_QUEUES = {
     }
 }
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.example.com' #change
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'your_email@example.com'      #change
-# EMAIL_HOST_PASSWORD = 'your_password'           #change
-# DEFAULT_FROM_EMAIL = 'webmaster@example.com'    #change
-
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'mail.smtp2go.com' #change
+EMAIL_PORT = 2525
+EMAIL_USE_TLS = True  
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = 'registry@naueka.de'      #change
+EMAIL_HOST_PASSWORD = 'AAnp4mwgAxeQI6fN'           #change
+DEFAULT_FROM_EMAIL = 'registry@naueka.de'
 
