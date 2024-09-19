@@ -1,3 +1,4 @@
+from django.shortcuts import redirect, render
 from rest_framework.authtoken.views import ObtainAuthToken, APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -19,35 +20,6 @@ from filmflix.serializers import ChangeNameSerializer, ChangePasswordSerializer,
 
 User = get_user_model()
 
-
-# def signup(request):  
-#     if request.method == 'POST':  
-#         form = SignupForm(request.POST)  
-#         if form.is_valid():  
-#             # save form in the memory not in database  
-#             user = form.save(commit=False)  
-#             user.is_active = False  
-#             user.save()  
-#             # to get the domain of the current site  
-#             current_site = get_current_site(request)  
-#             mail_subject = 'Activation link has been sent to your email id'  
-#             message = render_to_string('acc_active_email.html', {  
-#                 'user': user,  
-#                 'domain': current_site.domain,  
-#                 'uid':urlsafe_base64_encode(force_bytes(user.pk)),  
-#                 'token':account_activation_token.make_token(user),  
-#             })  
-#             to_email = form.cleaned_data.get('email')  
-#             email = EmailMessage(  
-#                         mail_subject, message, to=[to_email]  
-#             )  
-#             email.send()  
-#             return HttpResponse('Please confirm your email address to complete the registration')  
-#     else:  
-#         form = SignupForm()  
-#     return render(request, 'signup.html', {'form': form}) 
-
-
 def activate(request, uidb64, token):  
     User = get_user_model()  
     try:  
@@ -58,34 +30,12 @@ def activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):  
         user.is_active = True  
         user.save()  
-        return HttpResponse('Thank you for your email confirmation. Now you can login your account.')  
+        return redirect('http://localhost:4200/confirm') 
     else:  
         return HttpResponse('Activation link is invalid!') 
 
 
 class RegisterView(APIView):
-    
-    # def post(self, request, format=None):
-    #     try:
-    #         user = User.objects.create_user(username=request.data.get('username'),
-    #                                         email=request.data.get('email'),
-    #                                         password=request.data.get('password'),
-    #                                         icon=request.data.get("icon"))
-    
-    #             user.is_active = False  
-    #             user.save()  
-    #         token, created = Token.objects.get_or_create(user=user)            
-    #         icon_serializer = IconSerializer(user.icon)  
-            
-    #         return Response({
-    #             'token': token.key,
-    #             'username': user.username,
-    #             'email': user.email,
-    #             'icon': icon_serializer.data
-    #         })
-            
-    #     except:
-    #         return 
     
     def post(self, request, format=None):  
         try:
@@ -114,7 +64,7 @@ class RegisterView(APIView):
             # to get the domain of the current site  
             current_site = get_current_site(request)  
             print(current_site)
-            mail_subject = 'Activation link has been sent to your email id'  
+            mail_subject = 'link Sportflix'  
             try:
                 print("Rendering email template")
                 message = render_to_string('acc_active_email.html', {  
@@ -124,6 +74,7 @@ class RegisterView(APIView):
                     'token': account_activation_token.make_token(user),  
                 })
                 print("Email template rendered successfully")
+                
             except Exception as e:
                 print(f"Error rendering email template: {str(e)}")
                 return JsonResponse({'error': f'Email template error: {str(e)}'}, status=500)   
@@ -133,7 +84,7 @@ class RegisterView(APIView):
             )  
             email.send()
             
-            return HttpResponse('Please confirm your email address to complete the registration')  
+            return JsonResponse({'message': 'Please confirm your email address'}, status=200) 
     
         except Exception as e:
             print(f"Error during registration: {str(e)}")  # Detaillierte Fehlermeldung drucken

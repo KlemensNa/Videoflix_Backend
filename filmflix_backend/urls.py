@@ -33,5 +33,5 @@ urlpatterns = [
     path('django-rq/', include('django_rq.urls')),
     path('change_password/<int:pk>/', ChangePassword.as_view()),
     path('change_name/<int:pk>/', ChangeName.as_view()),
-    path('activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/', activate),
+    path('activate/<uidb64>/<token>/', activate),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

@@ -41,6 +41,12 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",
 ]
 
+CORS_ALLOW_HEADERS = [
+    'content-type',
+    'authorization',
+    # andere erlaubte Header
+]
+
 # CSRF_TRUSTED_ORIGINS = ['http://localhost:4200', 'http://127.0.0.1'] #weg nach entwicklunsgphase
 
 # CSRF_COOKIE_SECURE = False
