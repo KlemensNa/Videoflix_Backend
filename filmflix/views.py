@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import redirect, render
 from rest_framework.authtoken.views import ObtainAuthToken, APIView
 from rest_framework.authtoken.models import Token
@@ -6,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, generics
 from filmflix.models import Icon, Video
 from django.contrib.auth import get_user_model
-
+from django.contrib.auth.tokens import default_token_generator
 from django.http import HttpResponse, JsonResponse   
 from django.contrib.sites.shortcuts import get_current_site  
 from django.utils.encoding import force_bytes, force_str  
@@ -14,7 +15,9 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string  
 from .token import account_activation_token  
 from django.contrib.auth.models import User  
-from django.core.mail import EmailMessage  
+from django.core.mail import EmailMessage, send_mail
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
 from filmflix.serializers import ChangeNameSerializer, ChangePasswordSerializer, CustomerUserSerializer, IconSerializer, VideoSerializer
 
@@ -38,9 +41,7 @@ def activate(request, uidb64, token):
 class RegisterView(APIView):
     
     def post(self, request, format=None):  
-        try:
-            print("hello", request.data)
-            
+        try:           
             icon_data = request.data.get("icon")
             icon_id = icon_data.get('id') if icon_data else None
 
@@ -63,7 +64,6 @@ class RegisterView(APIView):
           
             # to get the domain of the current site  
             current_site = get_current_site(request)  
-            print(current_site)
             mail_subject = 'link Sportflix'  
             try:
                 print("Rendering email template")
@@ -73,7 +73,6 @@ class RegisterView(APIView):
                     'uid': urlsafe_base64_encode(force_bytes(user.pk)),  
                     'token': account_activation_token.make_token(user),  
                 })
-                print("Email template rendered successfully")
                 
             except Exception as e:
                 print(f"Error rendering email template: {str(e)}")
@@ -192,8 +191,67 @@ class ChangePassword(APIView):
             obj.save()
             return Response({'success': 'Password changed successfully'}, status=200)
         return Response(serializer.errors, status=400)
-    
-    
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CustomPasswordResetView(APIView):
+    def post(self, request):
+        
+        print("HIIIIIER", request)
+        
+        data = json.loads(request.body)
+        print(data)
+        email = data.get('email') 
+        print(email)# Get email from JSON
+        
+        if not email:
+            return JsonResponse({'error': 'Email is required'}, status=400)
+
+        try:
+            user = User.objects.get(email=email)
+            print("Hello", user)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User with this email does not exist'}, status=404)
+
+        # Generate password reset token and UID
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+        # Build the reset URL for the Angular frontend
+        reset_url = f'http://localhost:4200/setnewpassword/{uid}/{token}'
+
+        # Send the password reset email
+        mail_subject = 'Password Reset Requested'
+        message = f'Click the link to reset your password: {reset_url}'
+        email = EmailMessage(  
+            mail_subject, message, to=[email]  
+            )
+        email.send() 
+
+        return JsonResponse({'status': 'Password reset email sent successfully'})
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CustomPasswordResetConfirmView(APIView):
+    def post(self, request, uidb64, token):
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user is not None and default_token_generator.check_token(user, token):
+            new_password1 = request.POST.get('new_password1')
+            new_password2 = request.POST.get('new_password2')
+
+            if new_password1 and new_password1 == new_password2:
+                user.set_password(new_password1)
+                user.save()
+                return JsonResponse({'status': 'Password has been reset successfully'})
+            else:
+                return JsonResponse({'error': 'Passwords do not match'}, status=400)
+        else:
+            return JsonResponse({'error': 'Invalid token or user ID'}, status=400)  
 
 class ChangeName(APIView):
 

@@ -8,8 +8,12 @@ django-cors-headers==4.3.1
 django-debug-toolbar==4.4.2
 django-import-export==4.0.7
 django-redis==5.4.0
+django-rest-passwordreset==1.4.1
 django-rq==2.10.2
 djangorestframework==3.15.1
+djangorestframework-simplejwt==5.3.1
+pillow==10.3.0
+PyJWT==2.9.0
 python-dateutil==2.9.0.post0
 redis==5.0.4
 rq==1.16.2
