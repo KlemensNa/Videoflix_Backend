@@ -33,7 +33,7 @@ def activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):  
         user.is_active = True  
         user.save()  
-        return redirect('http://localhost:4200/confirm') 
+        return redirect(f'http://localhost:4200/confirm/{uid}') 
     else:  
         return HttpResponse('Activation link is invalid!') 
 
@@ -122,7 +122,7 @@ class LoginView(ObtainAuthToken):
      
 
 class VideoView(APIView):    
-    #Authentication with token
+    # Authentication with token
     # permission only when authentication is successful
     # authentication_classes = [TokenAuthentication]
     # permission_classes = [IsAuthenticated]
@@ -193,16 +193,13 @@ class ChangePassword(APIView):
         return Response(serializer.errors, status=400)
 
 
+
 @method_decorator(csrf_exempt, name='dispatch')
 class CustomPasswordResetView(APIView):
     def post(self, request):
         
-        print("HIIIIIER", request)
-        
         data = json.loads(request.body)
-        print(data)
-        email = data.get('email') 
-        print(email)# Get email from JSON
+        email = data.get('email')         
         
         if not email:
             return JsonResponse({'error': 'Email is required'}, status=400)
@@ -217,10 +214,8 @@ class CustomPasswordResetView(APIView):
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-        # Build the reset URL for the Angular frontend
         reset_url = f'http://localhost:4200/setnewpassword/{uid}/{token}'
 
-        # Send the password reset email
         mail_subject = 'Password Reset Requested'
         message = f'Click the link to reset your password: {reset_url}'
         email = EmailMessage(  
@@ -233,16 +228,20 @@ class CustomPasswordResetView(APIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CustomPasswordResetConfirmView(APIView):
-    def post(self, request, uidb64, token):
+    def post(self, request, uidb64, token):       
+        
         try:
             uid = urlsafe_base64_decode(uidb64).decode()
             user = User.objects.get(pk=uid)
+            
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             user = None
 
         if user is not None and default_token_generator.check_token(user, token):
-            new_password1 = request.POST.get('new_password1')
-            new_password2 = request.POST.get('new_password2')
+            
+            data = json.loads(request.body)
+            new_password1 = data.get('new_password1')
+            new_password2 = data.get('new_password2')
 
             if new_password1 and new_password1 == new_password2:
                 user.set_password(new_password1)
