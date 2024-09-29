@@ -90,9 +90,6 @@ class RegisterView(APIView):
             return JsonResponse({'error': str(e)}, status=500) 
         
 
- 
-
-
 class CurrentUserView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -139,35 +136,48 @@ class VideoView(APIView):
             video = Video.objects.all()
             serializer = VideoSerializer(video, many=True)
             return Response(serializer.data)
+        
     
-    # def post(self, request, format=None):
-    #     serializer = TaskPOSTSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #             serializer.save()          
-    #             return Response(serializer.data)
-    #     return Response(serializer.errors)
+    def post(self, request):
+        data = request.data
+        video_file = data.get('new_video')
+        thumbnail_file = data.get('new_thumbnail')
+        video = Video(
+            title=data.get('new_title'),
+            description=data.get('new_description'),
+            videos_file=video_file,
+            thumbnail=thumbnail_file,
+            sport=request.data.get('sport', ''),  # Optional, falls nicht übergeben
+            category=request.data.get('category', None)  # Optional, falls nicht übergeben
+        )
+        
+        video.save()
+
+        return Response({
+            "message": "Video erfolgreich hochgeladen",
+            "video_id": video.id
+        }, status=status.HTTP_201_CREATED)
+        
     
-    # def put(self, request, pk, format=None):
+    # def delete(self, request, pk, format=None):
     #     try:
-    #         task = Video.objects.get(pk=pk)
+    #         video = Video.objects.get(pk=pk)
     #     except Video.DoesNotExist:
     #         return Response(status=status.HTTP_404_NOT_FOUND)
         
-    #     serializer = TaskPOSTSerializer(task, data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request, pk, format=None):
-        try:
-            video = Video.objects.get(pk=pk)
-        except Video.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+    #     video.delete()
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class VideoChoicesView(APIView):
+    def get(self, request):
+        sport_choices = Video.SPORT_CHOICES
+        category_choices = Video.CATEGORY_CHOICES
         
-        video.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    
+        return Response({
+            "sport_choices": sport_choices,
+            "category_choices": category_choices
+        }, status=status.HTTP_200_OK) 
     
 
 class ChangePassword(APIView):
