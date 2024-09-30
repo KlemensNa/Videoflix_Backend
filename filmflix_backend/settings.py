@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_safe_settings',
     "debug_toolbar",
     'rest_framework',
     'rest_framework.authtoken',
@@ -113,12 +114,24 @@ WSGI_APPLICATION = 'filmflix_backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'sport',
+        'USER': 'postgres',
+        'PASSWORD': "enc:d7315ac2b411b0ae1b65d797fedb3672",
+        'PORT': '5432',
+        'HOST': 'localhost'        
     }
 }
+
 
 
 # Password validation
@@ -209,6 +222,13 @@ EMAIL_PORT = 2525
 EMAIL_USE_TLS = True  
 EMAIL_USE_SSL = False
 EMAIL_HOST_USER = 'registry@naueka.de'      #change
-EMAIL_HOST_PASSWORD = 'AAnp4mwgAxeQI6fN'           #change
+EMAIL_HOST_PASSWORD = 'enc:f6c5e5dd6438ffa0947ea37e9d877eafccf98e60a90bad02ff691d46c97e27cb'           #change
 DEFAULT_FROM_EMAIL = 'registry@naueka.de'
+
+
+## ##################################################################
+## this must be at the bottom of settings.py
+## ##################################################################
+from django_safe_settings.patch import patch_all
+patch_all()
 

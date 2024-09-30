@@ -59,8 +59,7 @@ class RegisterView(APIView):
                                             icon=icon_instance)
             print(user)
             user.is_active = False  
-            user.save()
-            
+            user.save()            
           
             # to get the domain of the current site  
             current_site = get_current_site(request)  
@@ -147,8 +146,8 @@ class VideoView(APIView):
             description=data.get('new_description'),
             videos_file=video_file,
             thumbnail=thumbnail_file,
-            sport=request.data.get('sport', ''),  # Optional, falls nicht übergeben
-            category=request.data.get('category', None)  # Optional, falls nicht übergeben
+            sport=request.data.get('sport', ''),  
+            category=request.data.get('category', None)  
         )
         
         video.save()
