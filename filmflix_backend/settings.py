@@ -15,6 +15,7 @@ import os
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.conf import settings
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -46,12 +47,6 @@ CORS_ALLOW_HEADERS = [
     'authorization',
     # andere erlaubte Header
 ]
-
-# CSRF_TRUSTED_ORIGINS = ['http://localhost:4200', 'http://127.0.0.1'] #weg nach entwicklunsgphase
-
-# CSRF_COOKIE_SECURE = False
-
-# SESSION_COOKIE_SECURE = False
 
 DEBUG = True
 
@@ -121,17 +116,29 @@ WSGI_APPLICATION = 'filmflix_backend.wsgi.application'
 #     }
 # }
 
+#local PostgreSQL
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'sport',
+#         'USER': 'postgres',
+#         'PASSWORD': "enc:d7315ac2b411b0ae1b65d797fedb3672",
+#         'PORT': '5432',
+#         'HOST': 'localhost'        
+#     }
+# }
+
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'sport',
-        'USER': 'postgres',
-        'PASSWORD': "enc:d7315ac2b411b0ae1b65d797fedb3672",
-        'PORT': '5432',
-        'HOST': 'localhost'        
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'defaultdb',
+        'USER': 'avnadmin',
+        'PASSWORD': "enc:a265a3375b674f853669efc9358743dfd6c0264a290345071619f0969cf8876c",
+        'PORT': '22539',
+        'HOST': 'sportflix-postgres-sportflix.b.aivencloud.com'        
     }
 }
-
 
 
 # Password validation
