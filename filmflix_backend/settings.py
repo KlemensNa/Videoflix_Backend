@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import environ
 import os
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.conf import settings
@@ -20,11 +21,15 @@ from django.conf import settings
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-n8j!*7#&93*ef6qad^(^uf%y+2$8@r%kw5!v*8=z8-gectuv-c'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -106,9 +111,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'filmflix_backend.wsgi.application'
 
 
-# Database
+# Databases
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+#SQLite
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
@@ -120,23 +126,22 @@ WSGI_APPLICATION = 'filmflix_backend.wsgi.application'
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'sport',
-#         'USER': 'postgres',
-#         'PASSWORD': "enc:d7315ac2b411b0ae1b65d797fedb3672",
-#         'PORT': '5432',
-#         'HOST': 'localhost'        
+#         'NAME': env('DB_NAME_LOCAL'),
+#         'USER': env('DB_USER_LOCAL'),
+#         'PASSWORD': env('DB_PASSWORD_LOCAL'),
+#         'PORT': env('DB_PORT_LOCAL'),
+#         'HOST': env('DB_HOST_LOCAL'),        
 #     }
 # }
 
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'defaultdb',
-        'USER': 'avnadmin',
-        'PASSWORD': "enc:a265a3375b674f853669efc9358743dfd6c0264a290345071619f0969cf8876c",
-        'PORT': '22539',
-        'HOST': 'sportflix-postgres-sportflix.b.aivencloud.com'        
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'PORT': env('DB_PORT'),
+        'HOST': env('DB_HOST'),        
     }
 }
 
@@ -224,18 +229,18 @@ RQ_QUEUES = {
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'mail.smtp2go.com' #change
-EMAIL_PORT = 2525
-EMAIL_USE_TLS = True  
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_PORT = env('EMAIL_PORT')
+EMAIL_USE_TLS = True 
 EMAIL_USE_SSL = False
-EMAIL_HOST_USER = 'registry@naueka.de'      #change
-EMAIL_HOST_PASSWORD = 'enc:f6c5e5dd6438ffa0947ea37e9d877eafccf98e60a90bad02ff691d46c97e27cb'           #change
-DEFAULT_FROM_EMAIL = 'registry@naueka.de'
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')  
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')          
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
 
 
 ## ##################################################################
 ## this must be at the bottom of settings.py
 ## ##################################################################
-from django_safe_settings.patch import patch_all
-patch_all()
+# from django_safe_settings.patch import patch_all
+# patch_all()
 
