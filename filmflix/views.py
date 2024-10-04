@@ -41,7 +41,16 @@ def activate(request, uidb64, token):
 class RegisterView(APIView):
     
     def post(self, request, format=None):  
-        try:           
+        try:
+            
+            email = request.data.get('email')
+            if not email:
+                return Response({'error': 'Email is required'}, status=400)
+            
+            username = request.data.get('username')
+            if not username:
+                return Response({'error': 'Username is required'}, status=400) 
+        
             icon_data = request.data.get("icon")
             icon_id = icon_data.get('id') if icon_data else None
 
@@ -57,7 +66,6 @@ class RegisterView(APIView):
                                             email=request.data.get('email'),
                                             password=request.data.get('password'),
                                             icon=icon_instance)
-            print(user)
             user.is_active = False  
             user.save()            
           
@@ -82,7 +90,7 @@ class RegisterView(APIView):
             )  
             email.send()
             
-            return JsonResponse({'message': 'Please confirm your email address'}, status=200) 
+            return Response({'message': 'Please confirm your email address'}, status=200) 
     
         except Exception as e:
             print(f"Error during registration: {str(e)}")  # Detaillierte Fehlermeldung drucken
@@ -100,21 +108,23 @@ class CurrentUserView(APIView):
 class LoginView(ObtainAuthToken):
     
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data,
-                                           context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        token, created = Token.objects.get_or_create(user=user)
-        print(user)
+        serializer = self.serializer_class(data=request.data, context={'request': request})
         
-        icon_serializer = IconSerializer(user.icon)
+        if serializer.is_valid():
+            user = serializer.validated_data['user']
+            token, created = Token.objects.get_or_create(user=user)
+            
+            # Icon-Serializer, wenn das Benutzer-Icon existiert
+            icon_serializer = IconSerializer(user.icon) if user.icon else None
+            
+            return Response({
+                'token': token.key,
+                'user_id': user.pk,
+                'username': user.username,
+                'icon': icon_serializer.data if icon_serializer else None
+            }, status=status.HTTP_200_OK)
         
-        return Response({
-            'token': token.key,
-            'user_id': user.pk,
-            'username': user.username,   
-            'icon': icon_serializer.data         
-        })               
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)               
      
 
 class VideoView(APIView):    
@@ -158,14 +168,14 @@ class VideoView(APIView):
         }, status=status.HTTP_201_CREATED)
         
     
-    # def delete(self, request, pk, format=None):
-    #     try:
-    #         video = Video.objects.get(pk=pk)
-    #     except Video.DoesNotExist:
-    #         return Response(status=status.HTTP_404_NOT_FOUND)
+    def delete(self, request, pk, format=None):
+        try:
+            video = Video.objects.get(pk=pk)
+        except Video.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
         
-    #     video.delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
+        video.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class VideoChoicesView(APIView):
@@ -215,7 +225,6 @@ class CustomPasswordResetView(APIView):
 
         try:
             user = User.objects.get(email=email)
-            print("Hello", user)
         except User.DoesNotExist:
             return JsonResponse({'error': 'User with this email does not exist'}, status=404)
 

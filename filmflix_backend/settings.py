@@ -15,6 +15,13 @@ import environ
 import os
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.conf import settings
+import sys
+
+# Überprüfe, ob die Tests ausgeführt werden
+# DEBUG_TOOLBAR_CONFIG = {
+#     'SHOW_TOOLBAR_CALLBACK': lambda request: False if 'test' in sys.argv else True,
+# }
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -53,8 +60,6 @@ CORS_ALLOW_HEADERS = [
     # andere erlaubte Header
 ]
 
-DEBUG = True
-
 CACHETTL = getattr(settings, 'CACHETTL', DEFAULT_TIMEOUT)
 
 # Application definition
@@ -67,7 +72,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_safe_settings',
-    "debug_toolbar",
     'rest_framework',
     'rest_framework.authtoken',
     'filmflix.apps.FilmflixConfig',
@@ -76,8 +80,12 @@ INSTALLED_APPS = [
     'django_rq',
 ]
 
+# if DEBUG:
+#     INSTALLED_APPS += [
+#         'debug_toolbar',
+#     ]    
+
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -86,9 +94,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    
+    'django.middleware.common.CommonMiddleware',    
 ]
+
+# if DEBUG:
+#     MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
 
 ROOT_URLCONF = 'filmflix_backend.urls'
 
@@ -141,7 +151,10 @@ DATABASES = {
         'USER': env('DB_USER'),
         'PASSWORD': env('DB_PASSWORD'),
         'PORT': env('DB_PORT'),
-        'HOST': env('DB_HOST'),        
+        'HOST': env('DB_HOST'),
+        'TEST': {
+            'NAME': 'test_filmflix',  # Testdatenbankname
+        },      
     }
 }
 
@@ -237,10 +250,4 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')          
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
 
-
-## ##################################################################
-## this must be at the bottom of settings.py
-## ##################################################################
-# from django_safe_settings.patch import patch_all
-# patch_all()
 

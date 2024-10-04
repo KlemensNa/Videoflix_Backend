@@ -10,6 +10,7 @@ Django==5.0.6
 django-click==2.4.0
 django-cors-headers==4.3.1
 django-debug-toolbar==4.4.2
+django-environ==0.11.2
 django-import-export==4.0.7
 django-redis==5.4.0
 django-rest-passwordreset==1.4.1
