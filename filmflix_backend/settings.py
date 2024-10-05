@@ -43,7 +43,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'localhost',
-    '127.0.0.1'
+    '127.0.0.1',
+    "sportflix.naueka.de"
 ]
 
 INTERNAL_IPS = [
@@ -52,6 +53,7 @@ INTERNAL_IPS = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",
+    "https://sportflix.naueka.de"
 ]
 
 CORS_ALLOW_HEADERS = [
@@ -59,6 +61,8 @@ CORS_ALLOW_HEADERS = [
     'authorization',
     # andere erlaubte Header
 ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 CACHETTL = getattr(settings, 'CACHETTL', DEFAULT_TIMEOUT)
 
@@ -250,4 +254,11 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')          
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
 
+
+# CSRF_COOKIE_SECURE = True  # CSRF nur über HTTPS senden
+# SESSION_COOKIE_SECURE = True  # Session-Cookies nur über HTTPS
+# SECURE_SSL_REDIRECT = True  # Weiterleitung von HTTP auf HTTPS
+# SECURE_HSTS_SECONDS = 3600  # HTTP Strict Transport Security (HSTS)
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_HSTS_PRELOAD = True
 

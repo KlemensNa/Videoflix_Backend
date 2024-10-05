@@ -33,7 +33,7 @@ def activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):  
         user.is_active = True  
         user.save()  
-        return redirect(f'http://localhost:4200/confirm/{uid}') 
+        return redirect(f'https://sportflix.naueka.de/confirm/{uid}') 
     else:  
         return HttpResponse('Activation link is invalid!') 
 
@@ -232,7 +232,7 @@ class CustomPasswordResetView(APIView):
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-        reset_url = f'http://localhost:4200/setnewpassword/{uid}/{token}'
+        reset_url = f'https://sportflix.naueka.de/setnewpassword/{uid}/{token}'
 
         mail_subject = 'Password Reset Requested'
         message = f'Click the link to reset your password: {reset_url}'
