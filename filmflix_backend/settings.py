@@ -44,7 +44,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    "sportflix.naueka.de"
+    "sportflix.naueka.de",
+    "34.159.79.177"
 ]
 
 INTERNAL_IPS = [
@@ -199,7 +200,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/staticfiles/')
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True
 
