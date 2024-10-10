@@ -45,7 +45,8 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     "sportflix.naueka.de",
-    "34.159.79.177"
+    "34.159.79.177",
+    "sportflixapi.naueka.de"
 ]
 
 INTERNAL_IPS = [
@@ -54,6 +55,7 @@ INTERNAL_IPS = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",
+    "https://sportflixapi.naueka.de",
     "https://sportflix.naueka.de"
 ]
 
@@ -222,7 +224,7 @@ REST_FRAMEWORK = {
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 
 CACHES = {    
           "default": {        
