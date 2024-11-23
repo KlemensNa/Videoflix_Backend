@@ -271,44 +271,62 @@ class CustomPasswordResetConfirmView(APIView):
             return JsonResponse({'error': 'Invalid token or user ID'}, status=400)  
 
 class ChangeName(APIView):
-
+    
     def put(self, request, pk):
-        serializer = ChangeNameSerializer(data=request.data)
         
-        if serializer.is_valid():
-            new_name = serializer.validated_data['new_name']
-            new_icon_data = serializer.validated_data['new_icon']
-            new_first_name = serializer.validated_data['new_firstname']
-            new_last_name = serializer.validated_data['new_lastname']
-            
-            try:
-                user = User.objects.get(pk=pk)
-            except User.DoesNotExist:
-                return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-            
-            user.username = new_name
-            user.first_name = new_first_name
-            user.last_name = new_last_name
-            
-            print(user)
-            
-            try:
-                icon = Icon.objects.get(id=new_icon_data['id'])
-            except Icon.DoesNotExist:
-                # Falls das Icon nicht existiert, erstelle ein neues
-                icon_serializer = IconSerializer(data=new_icon_data)
-                print(icon_serializer)
-                if icon_serializer.is_valid():
-                    icon = icon_serializer.save()
-                else:
-                    return Response(icon_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            print(icon)
-            user.icon = icon
-            user.save()
+        serializer = self.validate_data(request.data)
+        if not serializer:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        new_name, new_first_name, new_last_name, new_icon_data = self.extract_validated_data(serializer)
+        user = self.get_user(pk)
+        if not user:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        self.update_user_data(user, new_name, new_first_name, new_last_name)
+       
+        icon = self.get_or_create_icon(new_icon_data)
+        if not icon:
+            return Response(IconSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        user.icon = icon
+        user.save()
 
-            return Response({'success': 'Name and Icon updated successfully'}, status=status.HTTP_200_OK)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'success': 'Name and Icon updated successfully'}, status=status.HTTP_200_OK)
+    
+    def validate_data(self, data):
+        serializer = ChangeNameSerializer(data=data)
+        if serializer.is_valid():
+            return serializer
+        return None
+    
+    def extract_validated_data(self, serializer):
+        new_name = serializer.validated_data['new_name']
+        new_first_name = serializer.validated_data['new_firstname']
+        new_last_name = serializer.validated_data['new_lastname']
+        new_icon_data = serializer.validated_data['new_icon']
+        return new_name, new_first_name, new_last_name, new_icon_data
+    
+    def get_user(self, pk):
+        try:
+            return User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return None
+    
+    def update_user_data(self, user, new_name, new_first_name, new_last_name):
+        user.username = new_name
+        user.first_name = new_first_name
+        user.last_name = new_last_name
+    
+    def get_or_create_icon(self, new_icon_data):
+        try:
+            return Icon.objects.get(id=new_icon_data['id'])
+        except Icon.DoesNotExist:
+            icon_serializer = IconSerializer(data=new_icon_data)
+            if icon_serializer.is_valid():
+                return icon_serializer.save()
+        return None
+
 
     
 

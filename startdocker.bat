@@ -1,0 +1,1 @@
+docker run --publish 8000:8000 -it -v "C:/Users/kleme/Desktop/DeveloperAkademie/Backend/08_Filmflix/filmflix_backend:/usr/src/app" sportflix_backend bash 

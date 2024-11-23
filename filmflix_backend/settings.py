@@ -56,7 +56,7 @@ INTERNAL_IPS = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",
     "https://sportflixapi.naueka.de",
-    "https://sportflix.naueka.de"
+    "https://sportflix.naueka.de",     
 ]
 
 CORS_ALLOW_HEADERS = [
